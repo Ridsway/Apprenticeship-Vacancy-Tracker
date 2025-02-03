@@ -54,6 +54,13 @@ while True:
             # Extract job title (from <span> containing the title)
             title_element = apprenticeship.find_element(By.TAG_NAME, "span") 
             title = title_element.text.strip()
+            title = title.replace("Digital Technology Solutions", "DTS").strip()
+            title = title.replace("Digital & Technology Solutions", "DTS").strip()
+            title = title.replace("Digital and Technology Solutions", "DTS").strip()
+            title = title.replace("Digital Technologies Solutions", "DTS").strip()
+            title = title.replace("Digital and technology solutions", "DTS").strip()
+            title = title.replace("Application Production Services", "APS").strip()
+            title = title.replace("Nuclear Software Engineering", "SWE").strip()
 
             # Employer name
             employer_element = apprenticeship.find_element(By.CLASS_NAME, "govuk-body")
@@ -68,11 +75,26 @@ while True:
             wage = wage_element.text.strip()
 
             # Remover the word 'Wage' from the string and extra spaces
-            wage = wage.replace("Wage", "").strip()
+            wage = wage_element.text.replace("Wage", "").replace("a year", "").strip()
 
             # Job link (the <a> tag)
             link_element = apprenticeship.find_element(By.CLASS_NAME, "das-search-results__link")
             apprenticeship_url = link_element.get_attribute("href")
+
+            # Deadline
+            try:
+                deadline_element = apprenticeship.find_elements(By.CLASS_NAME, "govuk-body")[4]
+                deadline = deadline_element.text.replace("Closes in ", "").strip()
+            except:
+                deadline = "Not specified"
+
+            # Date Posted
+            try:
+                posted_element = apprenticeship.find_elements(By.CLASS_NAME, "govuk-body")[5]
+                date_posted = posted_element.text.replace("Posted ", "").strip()
+            except:
+                date_posted = "Not specified"
+
 
             # Store apprenticeship details
             apprenticeships.append({
@@ -80,6 +102,8 @@ while True:
                 "Employer": employer,
                 "Location": location,
                 "Wage": wage,
+                "Deadline": deadline,
+                "Posted": date_posted,
                 "URL": apprenticeship_url
             })
 

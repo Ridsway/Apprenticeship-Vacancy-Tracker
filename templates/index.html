@@ -4,18 +4,398 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Apprenticeship Vacancy Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <style>
+        .fixed-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #2a2a2a; /* Deep navy */
+            color: white;
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            background-color: #1e1e1e;
+            padding: 15px 0;
+            display: flex;
+            justify-content: flex-end;
+            padding-right: 50px; /* Moves navbar slightly right */
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .nav-item {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 0 20px;
+            position: relative;
+            cursor: pointer;
+            transition: color 0.3s ease-in-out;
+        }
+
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -5px;
+            width: 100%;
+            height: 3px;
+            background-color: #444; /* Darker underline */
+            transform: scaleX(0);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .nav-item:hover::after {
+            transform: scaleX(1);
+        }
+
+        .active {
+            color: white;
+        }
+
+        .active::after {
+            background-color: white; /* Brighter underline for active */
+            transform: scaleX(1);
+        }
+
+        /* Cover Section */
+        .cover {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: #1e1e1e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            transition: transform 1s ease-in-out;
+            z-index: 2000;
+        }
+
+        .cover h1 {
+            font-size: 3rem;
+            font-weight: bold;
+        }
+
+        .cover p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin-bottom: 20px;
+        }
+
+        .cover button {
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 20px;
+            background-color: #6f42c1;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .cover button:hover {
+            background-color: #5936a8;
+        }
+
+        /* Job Listings Section */
+        .main-content {
+            position: relative;
+            top: 100vh; /* Initially below the viewport */
+            transition: transform 1s ease-in-out;
+            padding-top: 60px; /* To prevent fixed header from overlapping content */
+        }
+
+        .job-card {
+            width: 900px; /* Fixed width */
+            min-width: 900px; /* Ensures consistency */
+            max-width: 900px; /* Prevents expansion */
+            flex: none; /* Prevents flex from resizing the cards */
+            background-color: #1e1e1e;
+            color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            min-height: 450px;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            display: flex; /* Flexbox */
+            flex-direction: column; /* Arrange children in a column */
+            justify-content: center;
+            align-items: center;
+            margin: 0 15px;
+            position: relative;
+        }
+
+        .job-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+        }
+
+        .job-card h3 {
+            font-size: 30px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .job-container {
+            display: flex;
+            overflow-x: hidden; /* Prevent unwanted scrolling */
+            scroll-behavior: smooth; /* Smooth scrolling effect */
+            width: 100%; /* Ensure it takes the full width */
+            padding: 20px 0; /* Space above and below */
+            white-space: nowrap; /* Prevents wrapping */
+        }
+
+        .arrow-btn {
+            font-size: 2rem;
+            color: #6f42c1;
+            position: absolute;
+            top: 50%;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .arrow-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .prev-btn {
+            left: 20px; /* Left arrow */
+        }
+
+        .next-btn {
+            right: 20px; /* Right arrow */
+        }
+
+        .btn-primary {
+            background-color: #6f42c1 !important; 
+            border-color: #6f42c1 !important;
+            transition: all 0.3s ease-in-out;
+            transform: scale(1);
+        }
+
+        .btn-primary:hover {
+            background-color: #ffffff !important;
+            border-color: #ffffff !important;
+            color: #1e1e1e !important;
+            transform: scale(1.1);
+        }
+
+        .custom-tooltip {
+            --bs-tooltip-bg: #5936a8;
+            --bs-tooltip-color: var(--bs-white);
+        }
+
+        .applied-btn {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            font-size: 1.2rem;
+            padding: 5px 10px;
+            border-radius: 50%;
+        }
+        
+        /* Sort Icon in Header */
+        .sidebar-icon {
+            position: fixed;
+            left: 20px; /* Align to left */
+            top: 15px; /* Keep inside the header */
+            font-size: 1.8rem;
+            cursor: pointer;
+            margin-right: 15px;
+            transition: color 0.3s ease-in-out;
+        }
+
+        /* Sidebar - Initially Collapsed */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -250px; /* Hidden off-screen */
+            width: 250px;
+            height: 100vh;
+            background-color: #313030;
+            color: white;
+            padding: 20px;
+            transition: left 0.3s ease-in-out; /* Smooth slide-in */
+            z-index: 1100; /* Above other content */
+        }
+
+        /* Sidebar Visible Class (Added via JavaScript) */
+        .sidebar-visible {
+            left: 0; /* Slide into view */
+        }
+
+    </style>
 </head>
 <body>
-    <h1>Current Vacancies</h1>
-    <ul>
-        {% for apprenticeship in apprenticeships %}
-            <li>
-                <h3><a href="{{ apprenticeship['URL'] }}">{{ apprenticeship['Title'] }}</a></h3>
-                <p><strong>Employer:</strong> {{ apprenticeship['Employer'] }}</p>
-                <p><strong>Location:</strong> {{ apprenticeship['Location'] }}</p>
-                <p><strong>Wage:</strong> {{ apprenticeship['Wage'] }}</p>
-            </li>
-        {% endfor %}
-    </ul>
+
+    <script>
+        function switchTab(tab) {
+            // Reset all nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // Set active tab
+            document.getElementById(tab).classList.add('active');
+
+            // Update cover content
+            const coverTitle = document.getElementById("cover-title");
+            const coverContent = document.getElementById("cover-content");
+
+            if (tab === "home") {
+                coverTitle.innerText = "Welcome";
+                coverContent.innerText = "This is the homepage. Click on the tabs above to see different content.";
+            } else if (tab === "current") {
+                coverTitle.innerText = "Current Jobs";
+                coverContent.innerText = "Placeholder for current job listings.";
+            } else if (tab === "expired") {
+                coverTitle.innerText = "Expired Jobs";
+                coverContent.innerText = "Placeholder for expired job listings.";
+            }
+        }
+    </script>
+
+    <!-- Cover Section -->
+    <div class="cover" id="cover">
+        <!-- Navigation Bar -->
+        <nav class="navbar">
+            <span class="nav-item active" id="home" onclick="switchTab('home')">Home</span>
+            <span class="nav-item" id="current" onclick="switchTab('current')">Current</span>
+            <span class="nav-item" id="expired" onclick="switchTab('expired')">Expired</span>
+        </nav>
+        <h1>Apprenticeship Vacancy Tracker</h1>
+        <p>Find the best apprenticeship opportunities tailored for you. Click below to explore job listings.</p>
+        <button onclick="revealMainContent()">View Vacancies</button>
+    </div>
+
+    <header class="fixed-header">
+        <i class="bi bi-filter sidebar-icon" id="filterIcon"></i> <!-- Bootstrap filter icon -->
+        <h2>Apprenticeship Vacancy Tracker</h2>
+    </header>
+
+    <!-- Sidebar (Hidden Initially) -->
+    <div class="sidebar" id="sortSidebar">
+        <h3>Sort & Filter</h3>
+    </div>
+
+    <!-- Main Content (Job Listings) -->
+    <div class="main-content" id="mainContent">
+        
+        <div class="container my-5 position-relative">
+            <div class="job-container" id="jobContainer">
+                {% for apprenticeship in apprenticeships %}
+                    <div class="job-card">
+                        <!-- Job Title & Employer -->
+                        <h3 class="job-title">
+                            <a href="{{ apprenticeship['URL'] }}" class="text-light text-decoration-none">{{ apprenticeship['Title'] }}</a>
+                        </h3>
+                        <h4>{{ apprenticeship['Employer'] }}</h4>
+            
+                        <!-- Two-Column Layout for Details -->
+                        <div class="row mt-3">
+                            <!-- Left Side: Location & Wage -->
+                            <div class="col-md-6 text-start">
+                                <p><strong>Location:</strong> {{ apprenticeship['Location'] }}</p>
+                                <p><strong>Wage:</strong> {{ apprenticeship['Wage'] }}</p>
+                            </div>
+            
+                            <!-- Right Side: Deadline & Date Posted -->
+                            <div class="col-md-6 text-end">
+                                <p><strong>Deadline:</strong> {{ apprenticeship['Deadline'] }}</p>
+                                <p><strong>Date Posted:</strong> {{ apprenticeship['Posted'] }}</p>
+                            </div>
+                        </div>
+                        <a href="{{ apprenticeship['URL'] }}" class="btn btn-primary mt-3">Apply Now</a>
+                        <button type="button" class="btn btn-secondary applied-btn"
+                                data-bs-toggle="tooltip" data-bs-placement="top"
+                                data-bs-custom-class="custom-tooltip"
+                                data-bs-title="Applied?">
+                            <i class="bi bi-check-circle"></i> <!-- Bootstrap Icon -->
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <!-- Arrow Buttons -->
+        <div class="arrow-btn prev-btn" id="prevBtn">
+            <i class="bi bi-arrow-left"></i> <!-- Left arrow -->
+        </div>
+        <div class="arrow-btn next-btn" id="nextBtn">
+            <i class="bi bi-arrow-right"></i> <!-- Right arrow -->
+        </div>
+    </div>
+
+    <script>
+        function revealMainContent() {
+            document.getElementById('cover').style.transform = 'translateY(-100vh)';
+            document.getElementById('mainContent').style.transform = 'translateY(-100vh)';
+            
+            setTimeout(() => {
+                document.getElementById('cover').style.display = 'none';
+            }, 1000); // Matches the transition time (1s)
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const filterIcon = document.getElementById("filterIcon");
+            const sidebar = document.getElementById("sortSidebar");
+    
+            // Show sidebar when hovering over the filter icon
+            filterIcon.addEventListener("mouseenter", function () {
+                sidebar.classList.add("sidebar-visible");
+            });
+    
+            // Hide sidebar when mouse leaves both the icon and sidebar
+            sidebar.addEventListener("mouseleave", function () {
+                sidebar.classList.remove("sidebar-visible");
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const jobContainer = document.getElementById("jobContainer");
+            const prevBtn = document.getElementById("prevBtn");
+            const nextBtn = document.getElementById("nextBtn");
+        
+            const scrollAmount = 350; // Adjust for desired scrolling
+        
+            prevBtn.addEventListener("click", () => {
+                jobContainer.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+            });
+        
+            nextBtn.addEventListener("click", () => {
+                jobContainer.scrollBy({ left: scrollAmount, behavior: "smooth" });
+            });
+        });
+    </script>    
 </body>
 </html>
