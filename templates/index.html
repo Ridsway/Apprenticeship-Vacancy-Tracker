@@ -114,7 +114,8 @@
         }
 
         .cover button:hover {
-            background-color: #5936a8;
+            background-color: #3f2282;
+            transform: scale(1.1);
         }
 
         /* Job Listings Section */
@@ -137,18 +138,24 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
             text-align: center;
             min-height: 450px;
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            transition: transform 1s ease-in-out, box-shadow 1s ease-in-out;
             display: flex; /* Flexbox */
             flex-direction: column; /* Arrange children in a column */
             justify-content: center;
             align-items: center;
             margin: 0 15px;
             position: relative;
+            scroll-snap-align: center; /* Ensures card snaps to center */
         }
 
-        .job-card:hover {
+        /*.job-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 16px #6f42c1;
+        }*/
+
+        .job-card.active {
+            transform: scale(1);
+            box-shadow: 0 8px 16px #6f42c1;
         }
 
         .job-card h3 {
@@ -159,11 +166,27 @@
 
         .job-container {
             display: flex;
-            overflow-x: hidden; /* Prevent unwanted scrolling */
-            scroll-behavior: smooth; /* Smooth scrolling effect */
-            width: 100%; /* Ensure it takes the full width */
-            padding: 20px 0; /* Space above and below */
-            white-space: nowrap; /* Prevents wrapping */
+            overflow-x: auto;
+            scroll-snap-type: x mandatory; /* Enables smooth snapping */
+            scroll-behavior: smooth;
+            justify-content: flex-start;
+            align-items: center;
+            width: 100%;
+            padding: 20px 0;
+            white-space: nowrap;
+            scrollbar-width: none; /* Hides scrollbar in Firefox */
+            -ms-overflow-style: none; /* Hides scrollbar in IE */ /* Prevents wrapping */
+        }
+
+        .job-container::-webkit-scrollbar {
+            display: none; /* Hides scrollbar in Chrome/Safari */
+        }
+
+        /* Add padding to push the first job card to center */
+        .job-container::before {
+            content: "";
+            display: block;
+            min-width: 50vw; /* Pushes the first job card to center */
         }
 
         .arrow-btn {
@@ -227,28 +250,176 @@
         }
 
         /* Sidebar - Initially Collapsed */
+        /* Sidebar Styling */
         .sidebar {
             position: fixed;
             top: 0;
-            left: -250px; /* Hidden off-screen */
-            width: 250px;
+            left: -300px; /* Initially hidden */
+            width: 300px;
             height: 100vh;
-            background-color: #313030;
+            background-color: #313030; /* Dark grey theme */
             color: white;
             padding: 20px;
-            transition: left 0.3s ease-in-out; /* Smooth slide-in */
-            z-index: 1100; /* Above other content */
+            transition: left 0.3s ease-in-out;
+            z-index: 1100;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            border-right: 1px solid #444;
+            overflow-y: auto; /* Enable scrolling */
+            scrollbar-width: none; /* Hides scrollbar in Firefox */
+            -ms-overflow-style: none; /* Hides scrollbar in IE/Edge */
         }
 
-        /* Sidebar Visible Class (Added via JavaScript) */
-        .sidebar-visible {
-            left: 0; /* Slide into view */
+        .sidebar::-webkit-scrollbar {
+            display: none; /* Hides scrollbar in Chrome/Safari */
         }
+
+        .sidebar-visible {
+            left: 0; /* Show sidebar */
+        }
+
+        .sidebar h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .sidebar h5 {
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* Uniform Button Style */
+        .sidebar button, .sidebar select, .sidebar input, .sidebar .toggle {
+            width: 100%;
+            background: #1e1e1e;
+            color: white;
+            border: 1px solid #444;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-size: 1rem;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background 0.3s;
+        }
+
+        .sidebar button:hover, .sidebar select:hover, .sidebar input:hover {
+            background: #3a3a3a;
+        }
+
+        .sidebar label {
+            margin-bottom: 20px;
+        }
+
+        .sidebar input, 
+        .sidebar select, 
+        .sidebar button {
+            margin-top: 5px; /* Adds spacing between label and field */
+        }
+
+        /* Toggle Switch */
+        .toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .toggle input {
+            width: 40px;
+            height: 20px;
+            appearance: none;
+            background: #444;
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .toggle input:checked {
+            background: #6f42c1; /* Accent color */
+        }
+
+        .toggle input:before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 3px;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        .toggle input:checked:before {
+            transform: translateX(20px);
+        }
+
+        /* Apply & Reset Buttons */
+        .sidebar .btn-primary {
+            background: #6f42c1;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 1rem;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease-in-out, transform 0.3s ease-in-out;
+            position: sticky;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .sidebar .btn-primary:hover {
+            background: #3f2282 !important;
+            transform: scale(1.1);
+            border-color: #3f2282 !important;
+            color: white !important;
+        }
+
+        .sidebar .reset-btn {
+            background: transparent;
+            color: #ccc;
+            border: none;
+            font-size: 0.9rem;
+            cursor: pointer;
+            position: sticky;
+            bottom: 50px;
+            width: 100%;
+        }
+
+        .sidebar .reset-btn:hover {
+            color: white;
+        }
+
+        /* Backdrop Overlay */
+        .sidebar-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5); /* Dim effect */
+            z-index: 1000; /* Behind sidebar but above content */
+            display: none; /* Initially hidden */
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        /* When sidebar is open, show the backdrop */
+        .sidebar-visible ~ .sidebar-backdrop {
+            display: block;
+            opacity: 1;
+        }
+
 
     </style>
 </head>
 <body>
-
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
     <script>
         function switchTab(tab) {
             // Reset all nav items
@@ -297,6 +468,62 @@
     <!-- Sidebar (Hidden Initially) -->
     <div class="sidebar" id="sortSidebar">
         <h3>Sort & Filter</h3>
+
+        <!-- Sorting Options -->
+        <h5>Sort by:</h5>
+        <ul class="list-unstyled">
+            <li><i class="bi bi-calendar"></i> Date Posted
+                <select>
+                    <option>Newest → Oldest</option>
+                    <option>Oldest → Newest</option>
+                </select>
+            </li>
+            <li><i class="bi bi-hourglass"></i> Deadline
+                <select>
+                    <option>Earliest → Latest</option>
+                    <option>Latest → Earliest</option>
+                </select>
+            </li>
+            <li><i class="bi bi-cash-stack"></i> Wage
+                <select>
+                    <option>Highest → Lowest</option>
+                    <option>Lowest → Highest</option>
+                </select>
+            </li>
+            <li><i class="bi bi-building"></i> Employer Name
+                <select>
+                    <option>A → Z</option>
+                    <option>Z → A</option>
+                </select>
+            </li>
+        </ul>
+
+        <!-- Filtering Options -->
+        <h5>Filter by:</h5>
+        <ul class="list-unstyled">
+            <li><i class="bi bi-geo-alt"></i> Location
+                <input type="text" placeholder="Enter location">
+            </li>
+            <li><i class="bi bi-cash"></i> Wage Range
+                <input type="number" placeholder="Min"> - 
+                <input type="number" placeholder="Max">
+            </li>
+            <li><i class="bi bi-briefcase"></i> Employer
+                <input type="text" placeholder="Enter employer name">
+            </li>
+        </ul>
+        
+        <!-- Applied Status -->
+        <div class="toggle">
+            <label for="hideApplied">Hide Applied Jobs</label>
+            <input type="checkbox" id="hideApplied">
+        </div>
+
+        <!-- Buttons -->
+        <button class="btn btn-primary mt-3">Apply Filters</button>
+        <button class="btn btn-secondary mt-2">Reset Filters</button>
+    </div>
+
     </div>
 
     <!-- Main Content (Job Listings) -->
@@ -383,19 +610,97 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const jobContainer = document.getElementById("jobContainer");
+            const jobCards = document.querySelectorAll(".job-card");
             const prevBtn = document.getElementById("prevBtn");
             const nextBtn = document.getElementById("nextBtn");
-        
-            const scrollAmount = 350; // Adjust for desired scrolling
-        
+
+            let currentIndex = 0; // Start at the first job card
+
+            function scrollToCard(index) {
+                if (index < 0 || index >= jobCards.length) return; // Prevent out-of-bounds
+
+                const cardWidth = jobCards[index].offsetWidth; // Get a job card's width
+                const containerWidth = jobContainer.offsetWidth; // Get visible area width
+
+                // Calculate the exact scroll position to center the selected card
+                const scrollX = jobCards[index].offsetLeft - (containerWidth / 2) + (cardWidth / 2);
+
+                jobContainer.scrollTo({ left: scrollX, behavior: "smooth" });
+                currentIndex = index;
+
+                // Highlight the active card
+                updateActiveCard(index);
+            }
+
+            function updateActiveCard(index) {
+                jobCards.forEach((card, i) => {
+                    card.classList.toggle("active", i === index);
+                });
+            }
+
             prevBtn.addEventListener("click", () => {
-                jobContainer.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+                if (currentIndex > 0) {
+                    scrollToCard(currentIndex - 1);
+                }
             });
-        
+
             nextBtn.addEventListener("click", () => {
-                jobContainer.scrollBy({ left: scrollAmount, behavior: "smooth" });
+                if (currentIndex < jobCards.length - 1) {
+                    scrollToCard(currentIndex + 1);
+                }
+            });
+
+            // Detect manual scrolling and update the active card
+            jobContainer.addEventListener("scroll", () => {
+                let closestIndex = 0;
+                let closestDistance = Infinity;
+
+                jobCards.forEach((card, index) => {
+                    const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+                    const containerCenter = jobContainer.scrollLeft + jobContainer.offsetWidth / 2;
+                    const distance = Math.abs(cardCenter - containerCenter);
+
+                    if (distance < closestDistance) {
+                        closestDistance = distance;
+                        closestIndex = index;
+                    }
+                });
+
+                if (closestIndex !== currentIndex) {
+                    currentIndex = closestIndex;
+                    updateActiveCard(closestIndex);
+                }
+            });
+
+            // Ensure the first job card is centered on load
+            setTimeout(() => scrollToCard(0), 500);
+        });
+
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const filterIcon = document.getElementById("filterIcon");
+            const sidebar = document.getElementById("sortSidebar");
+            const backdrop = document.getElementById("sidebarBackdrop");
+
+            // Show sidebar and backdrop
+            filterIcon.addEventListener("mouseenter", function () {
+                sidebar.classList.add("sidebar-visible");
+                backdrop.style.display = "block"; // Show backdrop
+            });
+
+            // Hide sidebar and backdrop when leaving
+            sidebar.addEventListener("mouseleave", function () {
+                sidebar.classList.remove("sidebar-visible");
+                backdrop.style.display = "none"; // Hide backdrop
+            });
+
+            backdrop.addEventListener("click", function () {
+                sidebar.classList.remove("sidebar-visible");
+                backdrop.style.display = "none"; // Hide backdrop when clicking outside
             });
         });
-    </script>    
+
+    </script>
 </body>
 </html>

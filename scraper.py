@@ -1,5 +1,7 @@
 import time
+import re
 import pandas as pd
+from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -19,7 +21,7 @@ service = Service(CHROMEDRIVER_PATH)
 driver = webdriver.Chrome(service=service, options=chrome_options)
 
 # Navigate to the apprenticeship job listings page (1)
-base_url = "https://www.findapprenticeship.service.gov.uk/apprenticeships?routeIds=7&sort=DistanceAsc&levelIds=6&pageNumber="
+base_url = "https://www.findapprenticeship.service.gov.uk/apprenticeships?routeIds=7&sort=AgeAsc&levelIds=6&pageNumber="
 
 page_number = 1 # Start from first page
 apprenticeships = []  # Store apprenticeship details
@@ -61,6 +63,7 @@ while True:
             title = title.replace("Digital and technology solutions", "DTS").strip()
             title = title.replace("Application Production Services", "APS").strip()
             title = title.replace("Nuclear Software Engineering", "SWE").strip()
+            title = title.replace("Software Engineering", "SWE").strip()
 
             # Employer name
             employer_element = apprenticeship.find_element(By.CLASS_NAME, "govuk-body")
@@ -84,9 +87,25 @@ while True:
             # Deadline
             try:
                 deadline_element = apprenticeship.find_elements(By.CLASS_NAME, "govuk-body")[4]
-                deadline = deadline_element.text.replace("Closes in ", "").strip()
-            except:
+                raw_deadline_text = deadline_element.text.strip()
+
+                # Debugging: Print the extracted text from the website
+                print(f"Raw Deadline Text: {raw_deadline_text}")
+
+                # First, check if there is a date inside parentheses (Closes in X days (Monday 17 February))
+                match = re.search(r'\((?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)?\s*(\d{1,2} [A-Za-z]+)\)', raw_deadline_text)
+
+                if not match:
+                    # If no parentheses format, extract date from "Closes on Monday 31 March 2025"
+                    match = re.search(r'(?:Closes on )?(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)?\s*(\d{1,2} [A-Za-z]+)', raw_deadline_text)
+
+                deadline = match.group(1) if match else "Not specified"
+
+                print(f"Extracted Deadline: {deadline}")
+
+            except Exception as e:
                 deadline = "Not specified"
+                print(f"Error: {e}")
 
             # Date Posted
             try:
